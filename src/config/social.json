@@ -1,14 +1,14 @@
 {
-  "main": [
-    {
-      "name": "facebook",
-      "icon": "FaFacebookF",
-      "link": "https://www.facebook.com/marzellusco"
-    },
-    {
-      "name": "instagram",
-      "icon": "FaInstagram",
-      "link": "https://www.instagram.com/marzellusco/"
-    }
-  ]
+	"main": [
+		{
+			"name": "facebook",
+			"icon": "FaFacebookF",
+			"link": "https://www.facebook.com/marzellusco"
+		},
+		{
+			"name": "instagram",
+			"icon": "FaInstagram",
+			"link": "https://www.instagram.com/marzellusco/"
+		}
+	]
 }

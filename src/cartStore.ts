@@ -2,9 +2,9 @@ import { atom, computed } from "nanostores";
 import Cookies from "js-cookie";
 import { getCart } from "@/lib/shopify";
 import {
-  addItem,
-  removeItem,
-  updateItemQuantity,
+	addItem,
+	removeItem,
+	updateItemQuantity,
 } from "@/lib/utils/cartActions";
 import type { Cart } from "@/lib/shopify/types";
 
@@ -19,56 +19,56 @@ export const layoutView = atom<"card" | "list">("card");
 
 // Function to set a new layout view
 export function setLayoutView(view: "card" | "list") {
-  layoutView.set(view);
+	layoutView.set(view);
 }
 
 // Function to get the current layout view
 export function getLayoutView() {
-  return layoutView.get();
+	return layoutView.get();
 }
 
 // Update cart state in the store
 export async function refreshCartState() {
-  const cartId = Cookies.get("cartId");
-  if (cartId) {
-    const currentCart = await getCart(cartId);
-    cart.set(currentCart as any);
-  }
+	const cartId = Cookies.get("cartId");
+	if (cartId) {
+		const currentCart = await getCart(cartId);
+		cart.set(currentCart as any);
+	}
 }
 
 // Add item to the cart and update state
 export async function addItemToCart(selectedVariantId: string) {
-  try {
-    await addItem(selectedVariantId);
-    await refreshCartState();
-    return "Added to cart";
-  } catch (error: any) {
-    throw new Error(error.message || "Failed to add to cart");
-  }
+	try {
+		await addItem(selectedVariantId);
+		await refreshCartState();
+		return "Added to cart";
+	} catch (error: any) {
+		throw new Error(error.message || "Failed to add to cart");
+	}
 }
 
 // Remove item from the cart and update state
 export async function removeItemFromCart(lineId: string) {
-  try {
-    await removeItem(lineId);
-    await refreshCartState();
-    return "Removed from cart";
-  } catch (error: any) {
-    throw new Error(error.message || "Failed to remove item from cart");
-  }
+	try {
+		await removeItem(lineId);
+		await refreshCartState();
+		return "Removed from cart";
+	} catch (error: any) {
+		throw new Error(error.message || "Failed to remove item from cart");
+	}
 }
 
 // Update item quantity in the cart and update state
 export async function updateCartItemQuantity(payload: {
-  lineId: string;
-  variantId: string;
-  quantity: number;
+	lineId: string;
+	variantId: string;
+	quantity: number;
 }) {
-  try {
-    await updateItemQuantity(payload);
-    await refreshCartState();
-    return "Cart updated";
-  } catch (error: any) {
-    throw new Error(error.message || "Failed to update cart");
-  }
+	try {
+		await updateItemQuantity(payload);
+		await refreshCartState();
+		return "Cart updated";
+	} catch (error: any) {
+		throw new Error(error.message || "Failed to update cart");
+	}
 }

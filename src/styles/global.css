@@ -1,73 +1,73 @@
 @import "tailwindcss";
-@import "@/styles/buttons.css";
-@import "@/styles/components.css";
-@import "@/styles/lenis.css";
-@import "@/styles/main.css";
-@import "@/styles/navigation.css";
-@import "@/styles/search.css";
+@import "./buttons.css";
+@import "./components.css";
+@import "./lenis.css";
+@import "./main.css";
+@import "./navigation.css";
+@import "./search.css";
 
 @plugin "@tailwindcss/typography";
 @plugin "@tailwindcss/forms";
 
+@custom-variant dark (&:is(.dark *));
+
 @theme {
-  /* Light mode colors */
-  --color-text: theme(colors.neutral.800);
-  --color-light: theme(colors.neutral.900);
-  --color-dark: theme(colors.neutral.950);
-  --color-primary: theme(colors.neutral.800);
-  --color-body: theme(colors.neutral.50);
-  --color-border: theme(colors.neutral.400);
-  --color-theme-light: theme(colors.neutral.200);
-  --color-theme-dark: theme(colors.neutral.950);
-  /* Dark mode colors */
-  --color-darkmode-text: theme(colors.neutral.100);
-  --color-darkmode-light: theme(colors.neutral.400);
-  --color-darkmode-dark: theme(colors.neutral.50);
-  --color-darkmode-primary: theme(colors.neutral.50);
-  --color-darkmode-body: theme(colors.neutral.800);
-  --color-darkmode-border: theme(colors.neutral.600);
-  --color-darkmode-theme-light: theme(colors.neutral.700);
-  --color-darkmode-theme-dark: theme(colors.neutral.950);
+	/* Light mode colors */
+	--color-text: var(--color-neutral-800);
+	--color-light: var(--color-neutral-900);
+	--color-dark: var(--color-neutral-950);
+	--color-primary: var(--color-neutral-800);
+	--color-body: var(--color-neutral-50);
+	--color-border: var(--color-neutral-400);
+	--color-theme-light: var(--color-neutral-200);
+	--color-theme-dark: var(--color-neutral-950);
+	/* Dark mode colors */
+	--color-darkmode-text: var(--color-neutral-100);
+	--color-darkmode-light: var(--color-neutral-400);
+	--color-darkmode-dark: var(--color-neutral-50);
+	--color-darkmode-primary: var(--color-neutral-50);
+	--color-darkmode-body: var(--color-neutral-800);
+	--color-darkmode-border: var(--color-neutral-600);
+	--color-darkmode-theme-light: var(--color-neutral-700);
+	--color-darkmode-theme-dark: var(--color-neutral-950);
 
-  /* Font families */
-  --default-font-family: "IBM Plex Sans", ui-sans-serif, sans-serif;
+	/* Font families */
+	--default-font-family: "IBM Plex Sans", ui-sans-serif, sans-serif;
 
-  /* Custom animations */
-  @keyframes fadeIn {
-    0% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
-  --animate-fade-in: fadeIn 4s cubic-bezier(0.32, 0, 0.67, 0);
+	/* Custom animations */
+	@keyframes fadeIn {
+		0% {
+			opacity: 0;
+		}
+		100% {
+			opacity: 1;
+		}
+	}
+	--animate-fade-in: fadeIn 4s cubic-bezier(0.32, 0, 0.67, 0);
 }
 
 /* Preflight base styles */
 @layer base {
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    font-weight: var(--font-bold);
-    line-height: var(--leading-tight);
-  }
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		font-weight: var(--font-bold);
+		line-height: var(--leading-tight);
+	}
 
-  b,
-  strong {
-    font-weight: var(--font-semibold);
-  }
+	b,
+	strong {
+		font-weight: var(--font-semibold);
+	}
 }
-
-@variant dark (&:where(.dark, .dark *));
 
 @utility container {
-  margin-inline: auto;
-  padding-inline: 2rem;
+	margin-inline: auto;
+	padding-inline: 2rem;
 }
 @utility shadow {
-  box-shadow: 0px 4px 40px rgba(0, 0, 0, 0.05);
+	box-shadow: 0px 4px 40px rgba(0, 0, 0, 0.05);
 }

@@ -8,43 +8,43 @@ const ProductGrid = lazy(() => import("./ProductGrid"));
 const ProductList = lazy(() => import("./ProductList"));
 
 const ProductLayoutViews = ({
-  initialProducts,
-  initialPageInfo,
-  sortKey,
-  reverse,
-  searchValue,
+	initialProducts,
+	initialPageInfo,
+	sortKey,
+	reverse,
+	searchValue,
 }: {
-  initialProducts: Product[];
-  initialPageInfo: PageInfo;
-  sortKey: string;
-  reverse: boolean;
-  searchValue: string | null;
+	initialProducts: Product[];
+	initialPageInfo: PageInfo;
+	sortKey: string;
+	reverse: boolean;
+	searchValue: string | null;
 }) => {
-  const layout = useStore(layoutView);
+	const layout = useStore(layoutView);
 
-  return (
-    <div className="col-span-4 lg:col-span-3">
-      <Suspense fallback={<SkeletonCards />}>
-        {layout === "list" ? (
-          <ProductList
-            initialProducts={initialProducts}
-            initialPageInfo={initialPageInfo}
-            sortKey={sortKey}
-            reverse={reverse}
-            searchValue={searchValue}
-          />
-        ) : (
-          <ProductGrid
-            initialProducts={initialProducts}
-            initialPageInfo={initialPageInfo}
-            sortKey={sortKey}
-            reverse={reverse}
-            searchValue={searchValue}
-          />
-        )}
-      </Suspense>
-    </div>
-  );
+	return (
+		<div className="col-span-4 lg:col-span-3">
+			<Suspense fallback={<SkeletonCards />}>
+				{layout === "list" ? (
+					<ProductList
+						initialProducts={initialProducts}
+						initialPageInfo={initialPageInfo}
+						sortKey={sortKey}
+						reverse={reverse}
+						searchValue={searchValue}
+					/>
+				) : (
+					<ProductGrid
+						initialProducts={initialProducts}
+						initialPageInfo={initialPageInfo}
+						sortKey={sortKey}
+						reverse={reverse}
+						searchValue={searchValue}
+					/>
+				)}
+			</Suspense>
+		</div>
+	);
 };
 
 export default ProductLayoutViews;

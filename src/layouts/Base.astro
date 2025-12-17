@@ -1,11 +1,12 @@
 ---
+
+import { ClientRouter } from "astro:transitions";
+import { AstroFont } from "astro-font";
 import TwSizeIndicator from "@/components/TwSizeIndicator.astro";
 import config from "@/config/config.json";
 import { plainify } from "@/lib/utils/textConverter";
 import Footer from "@/partials/Footer.astro";
 import Header from "@/partials/Header.astro";
-import { AstroFont } from "astro-font";
-import { ClientRouter } from "astro:transitions";
 import "@/styles/global.css";
 
 const umamiId = import.meta.env.UMAMI_WEBSITE_ID;
@@ -90,7 +91,8 @@ const {
 
     <!-- Google Tag Manager script tag -->
     <script is:inline>
-      (function (w, d, s, l, i) {
+      // biome-ignore-start lint: Ignore Google Tag Manager script
+      ((w, d, s, l, i) => {
         w[l] = w[l] || [];
         w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
         var f = d.getElementsByTagName(s)[0],
@@ -100,6 +102,7 @@ const {
         j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
         f.parentNode.insertBefore(j, f);
       })(window, document, "script", "dataLayer", "GTM-5F9863D3");
+      // biome-ignore-end lint: Ignore Google Tag Manager script
     </script>
 
     <!-- Preconnect third party resources -->

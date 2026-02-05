@@ -6,6 +6,7 @@
 		"enabled": true
 	},
 	"workers_dev": true,
+	"preview_urls": true,
 	"compatibility_flags": [
 		"nodejs_compat",
 		"global_fetch_strictly_public"

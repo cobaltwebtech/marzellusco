@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1770257625070,
+      "tag": "0000_db-migration-marketing",
+      "breakpoints": true
+    }
+  ]
+}

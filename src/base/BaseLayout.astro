@@ -1,0 +1,121 @@
+---
+
+import "@/styles/global.css";
+import { join } from "node:path";
+import { AstroFont } from "astro-font";
+import Analytics from "@/base/Analytics.astro";
+import Meta from "@/base/Meta.astro";
+import Footer from "@/components/Footer.astro";
+import Header from "@/components/Header.astro";
+import { siteMeta } from "@/lib/site-data";
+
+interface Props {
+  title?: string;
+  externalAsset?: boolean;
+}
+
+const { title = siteMeta.title, externalAsset } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <title>{title}</title>
+    <!--Load and define fonts -->
+    <AstroFont
+      config={[
+        {
+          preload: true,
+          display: "swap",
+          name: "IBM Plex Sans",
+          fallback: "sans-serif",
+          src: [
+            {
+              weight: "100",
+              style: "normal",
+              path: join(process.cwd(), "public", "fonts", "IBMPlexSans-Thin.woff2"),
+            },
+            {
+              weight: "200",
+              style: "normal",
+              path: join(process.cwd(), "public", "fonts", "IBMPlexSans-ExtraLight.woff2"),
+            },
+            {
+              weight: "300",
+              style: "normal",
+              path: join(process.cwd(), "public", "fonts", "IBMPlexSans-Light.woff2"),
+            },
+            {
+              weight: "400",
+              style: "normal",
+              path: join(process.cwd(), "public", "fonts", "IBMPlexSans-Regular.woff2"),
+            },
+            {
+              weight: "500",
+              style: "normal",
+              path: join(process.cwd(), "public", "fonts", "IBMPlexSans-Medium.woff2"),
+            },
+            {
+              weight: "600",
+              style: "normal",
+              path: join(process.cwd(), "public", "fonts", "IBMPlexSans-SemiBold.woff2"),
+            },
+            {
+              weight: "700",
+              style: "normal",
+              path: join(process.cwd(), "public", "fonts", "IBMPlexSans-Bold.woff2"),
+            },
+          ],
+        },
+      ]}
+    />
+    <!-- Script to check for dark mode and set theme -->
+    <script is:inline>
+      function initTheme() {
+        const colorTheme = localStorage.getItem("colorTheme");
+        if (!colorTheme) {
+          if (window.matchMedia?.("(prefers-color-scheme: dark)").matches) {
+            document.documentElement.classList.add("dark");
+            localStorage.setItem("colorTheme", "dark");
+          } else {
+            document.documentElement.classList.remove("dark");
+            localStorage.setItem("colorTheme", "light");
+          }
+        } else {
+          if (colorTheme === "dark") {
+            document.documentElement.classList.add("dark");
+          } else if (colorTheme === "light") {
+            document.documentElement.classList.remove("dark");
+          } else if (colorTheme === "system") {
+            const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+            document.documentElement.classList.toggle("dark", prefersDark);
+          }
+        }
+      }
+
+      initTheme();
+      document.addEventListener("astro:after-swap", initTheme);
+    </script>
+    <!-- Preconnect third party resources -->
+    {
+      externalAsset && (
+        <link rel="preconnect" href="https://iframe.mediadelivery.net" />
+      )
+    }
+    <!-- All analytics scripts go in the Analytics component -->
+    <Analytics />
+    <!-- Meta tags, site data, SEO config -->
+    <Meta />
+  </head>
+
+  <body class="flex min-h-svh flex-col bg-background text-foreground text-base">
+    <Header />
+    <slot name="hero" />
+    <main
+      class="mx-auto flex w-full max-w-7xl flex-auto flex-col items-center justify-center space-y-8 p-8 lg:px-16 lg:space-y-12"
+    >
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

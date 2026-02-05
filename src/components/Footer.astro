@@ -1,0 +1,37 @@
+---
+import FacebookIcon from "@tabler/icons/outline/brand-facebook.svg";
+import InstagramIcon from "@tabler/icons/outline/brand-instagram.svg";
+import { Button } from "@/components/starwind/button";
+import { siteMeta } from "@/lib/site-data";
+---
+
+<footer class="bg-accent w-full">
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 px-6 py-8 text-muted-foreground">
+    <p>
+    &copy;<span id="current-year"></span> {siteMeta.title}. All rights reserved.
+    </p>
+    <div class="space-x-2">
+      <Button size="icon" href="https://www.facebook.com/marzellusco" target="_blank">
+        <FacebookIcon class="size-6" />
+      </Button>
+      <Button size="icon" href="https://www.instagram.com/marzellusco/" target="_blank">
+        <InstagramIcon class="size-6" />
+      </Button>
+    </div>
+    <p class="text-xs">
+      Website built by <a
+        href="https://www.cobaltweb.tech/?utm_source=marzellus&utm_medium=web&utm_campaign=client-site-links"
+        target="_blank"
+        class="underline">Cobalt Web Technologies</a
+      > in Austin, TX
+    </p>
+  </div>
+</footer>
+
+<script>
+  const year = new Date().getFullYear();
+  const element = document.getElementById("current-year");
+  if (element) {
+    element.innerText = year.toString();
+  };
+</script>

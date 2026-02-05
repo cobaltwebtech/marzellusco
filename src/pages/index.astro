@@ -1,67 +1,345 @@
 ---
 export const prerender = false;
 
-import { getEntry } from "astro:content";
-import FeaturedProducts from "@/components/FeaturedProducts.astro";
-import config from "@/config/config.json";
-import CollectionsGrid from "@/functional-components/CollectionsGrid";
-import Base from "@/layouts/Base.astro";
-import { getCollectionProducts, getCollections } from "@/lib/shopify";
-import CallToAction from "@/partials/CallToAction.astro";
-import SlideShow from "@/functional-components/SlideShow";
-import VideoHero from "@/components/VideoHero.astro";
+import { actions, isInputError } from "astro:actions";
+import { Image } from "astro:assets";
+import OctagonAlert from "@tabler/icons/outline/alert-octagon.svg";
+import Loader2 from "@tabler/icons/outline/loader-2.svg";
+import Send from "@tabler/icons/outline/send.svg";
+import ComingSoonGraphic from "@/assets/coming-soon-2.png";
+import BaseLayout from "@/base/BaseLayout.astro";
+import { Button } from "@/components/starwind/button";
+import {
+  Card,
+	CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/starwind/card";
+import { Checkbox } from "@/components/starwind/checkbox";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/starwind/dialog";
+import { Input } from "@/components/starwind/input";
+import { Label } from "@/components/starwind/label";
+import { Video } from "@/components/starwind/video";
 
-const { collections } = config.shopify;
-const collectionProducts = await getCollections();
-const sliderData = await getEntry("sections", "slideshow");
-const { slides } = sliderData?.data;
+const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 
-// Fetch featured products
-const { products: featuredProducts } = await getCollectionProducts({
-  collection: collections.featured_products,
-  reverse: false,
-});
+// Handle redirect on successful form submission
+const result = Astro.getActionResult(actions.storeMarketingForm);
+if (result && !result.error) {
+	return Astro.redirect("/submission-received");
+}
+
+// Check for errors to display
+let errorMessage: string | null = null;
+if (result?.error) {
+	if (isInputError(result.error)) {
+		// For validation errors, extract all field-level error messages from Zod
+		const fieldErrors = result.error.fields;
+		const errorMessages: string[] = [];
+
+		// Collect all field errors
+		for (const [messages] of Object.entries(fieldErrors)) {
+			if (messages && Array.isArray(messages) && messages.length > 0) {
+				// Join multiple errors for the same field with commas
+				errorMessages.push((messages as string[]).join(", "));
+			}
+		}
+
+		// Display all errors or a fallback message
+		errorMessage =
+			errorMessages.length > 0
+				? errorMessages.join(" • ")
+				: "Please check your form for errors and try again.";
+	} else {
+		// For non-validation errors, display the error message
+		errorMessage = result.error.message;
+	}
+}
 ---
 
-<Base isHomePage={true}>
-  <!-- Video Hero section -->
-  <section class="grid grid-cols-1 grid-rows-1 items-center gap-4">
-    <div class="animate-fade-in col-start-1 row-start-1">
-      <VideoHero />
-    </div>
-  </section>
+<BaseLayout>
+	<section slot="hero" class="animate-fade-in">
+		<Video 
+			src="https://iframe.mediadelivery.net/embed/367279/b953db3b-2dc2-4951-b056-f46011ce5b31?autoplay=true&loop=true&muted=true&preload=true&responsive=true"
+			autoplay={false} 
+			loop={true} 
+			muted={true}
+			controls={true}
+			/>
+	</section>
+	<section class="py-8 space-y-8 text-center">
+		<h2 class="text-3xl font-bold">The New Marzellus is Coming Soon</h2>
+		<p>Sign up to stay in the loop of our brand new launch.</p>
+		<Card class="max-w-xl pt-0">
+			<div class="p-4 rounded-t-xl">
+				<Image
+					src={ComingSoonGraphic}
+					alt="Coming soon graphic"
+					class="mx-auto w-1/4 object-cover"
+				/>
+			</div>
+			<form id="marketing-form" method="POST" action={actions.storeMarketingForm}>
+				<CardHeader>
+					<CardTitle>Sign Up to Stay in the Loop</CardTitle>
+					<CardDescription>
+						A brand-new Marzellus is coming soon. Sign up to be the first to know when we launch!
+					</CardDescription>
+				</CardHeader>
+				<CardContent class="text-left space-y-4 pb-4">
+					<div>
+						<Label for="fullname">Name <span class="text-error">*</span></Label>
+						<Input type="text" id="fullname" name="fullname" placeholder="Full Name" required />
+					</div>
+					<div>
+						<Label for="email">Email <span class="text-error">*</span></Label>
+						<Input type="email" id="email" name="email" placeholder="email@example.com" required />
+					</div>
+					<div>
+						<Label for="phone">Mobile Number</Label>
+						<Input type="tel" id="phone" name="phone" placeholder="123-456-7890" />
+					</div>
+					<div class="space-y-2">
+						<Checkbox id="confirm-policies" name="confirm-policies" label="I consent to providing my information" required />
+						<p class="text-xs text-muted-foreground font-light">
+							By signing up you consent to receive marketing communication from Marzellus.
+						</p>
+						<DialogTrigger for="consent-dialog" asChild>
+							<p class="text-xs underline hover:cursor-pointer">Read our Consent Notice</p>
+						</DialogTrigger>
+						<Dialog id="consent-dialog">
+							<DialogContent>
+								<DialogHeader>
+									<DialogTitle>Consent Notice</DialogTitle>
+									<DialogDescription>
+										Hey, we hate fine print too but we want you to be aware of how we use your info and that we value your privacy as well.
+									</DialogDescription>
+								</DialogHeader>
+								<div class="py-4 space-y-2 text-xs font-light">
+									<p>
+										By submitting this form, you agree that we may collect and use your name, email address, and mobile number to send you marketing communications about our products, including product launches, promotions, and related updates.
+									</p>
+									<p>
+										You acknowledge that these communications may be sent by email and, if you provide your mobile number, by text message/SMS and/or phone call. Message and data rates may apply.	You may opt out of marketing emails at any time by clicking the unsubscribe link in our emails. You may opt out of SMS message notifications by replying "STOP". If you provide a mobile phone number you agree to receive recurring marketing text messages at the number provided. Consent is not a condition of purchase.
+									</p>
+									<p>
+										Your information is stored securely, will not sell it, and will only share it with trusted service providers as needed to send these communications or operate our business.
+									</p>
+									<p>
+										For questions about how we handle your information, or to exercise your privacy choices, you may contact us at info@marzellusco.com.
+									</p>
+								</div>
+							</DialogContent>
+						</Dialog>
+					</div>
+					{errorMessage && (
+						<div
+							id="error-message"
+							class="rounded-lg border-2 border-orange-400 bg-red-700 p-3 font-bold text-white"
+						>
+							<div class="flex items-center justify-center gap-2">
+								<OctagonAlert class="size-5" />
+								<span>{errorMessage}</span>
+							</div>
+						</div>
+					)}
+				</CardContent>
+				<CardFooter class="flex flex-col gap-4">
+					<!-- Cloudflare Turnstile widget -->
+					<div class="space-y-2">
+						<p class="text-xs text-muted-foreground font-light text-left">
+							We're just checking that you're a real human filling out this form.
+							<br />Bad bots stay away!
+						</p>
+						<div
+							id="turnstile-widget"
+							data-sitekey={turnstileSiteKey}
+							data-size="flexible"
+						>
+						</div>
+					</div>
+					<Button type="submit" id="submit-button" class="w-full">
+						<Send class="size-5" id="send-icon" />
+						<Loader2
+							class="hidden size-5 animate-spin"
+							id="loader-icon"
+						/>
+						<span id="button-text">Sign Up</span>
+					</Button>
+				</CardFooter>
+			</form>
+		</Card>
+	</section>
+</BaseLayout>
 
-  <!-- Category section -->
-  <section class="section">
-    <div class="container">
-      <div class="mb-6 text-center md:mb-14">
-        <h1 class="text-3xl font-bold md:text-5xl">Collections</h1>
-      </div>
-      <CollectionsGrid client:load collections={collectionProducts} />
-    </div>
-  </section>
+<!-- Import and render the CF Turnstile widget -->
+<script
+	is:inline
+	src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+	async
+	defer
+></script>
+<script>
+	let turnstileWidgetId: string | null = null;
+	let formSubmitHandler: ((e: Event) => void) | null = null;
 
-  <!-- Slide Show section -->
-  <section>
-    <div class="container">
-      <div
-        class="bg-theme-light dark:bg-darkmode-theme-light mb-6 rounded-md py-10 md:mb-14"
-      >
-        <SlideShow client:load slides={slides} />
-      </div>
-    </div>
-  </section>
+	// Function to initialize Turnstile widget
+	function initializeTurnstile() {
+		const widget = document.getElementById("turnstile-widget");
+		
+		if (!widget || typeof turnstile === "undefined") {
+			return;
+		}
 
-  <!-- Featured Products section -->
-  <section>
-    <div class="container">
-      <div class="mb-6 text-center md:mb-14">
-        <h2 class="mb-2 text-2xl font-bold md:text-4xl">Featured Products</h2>
-        <p class="md:text-xl">Explore Today's Featured Picks!</p>
-      </div>
-      <FeaturedProducts products={featuredProducts} />
-    </div>
-  </section>
+		// Remove existing widget if it exists
+		if (turnstileWidgetId) {
+			try {
+				turnstile.remove(turnstileWidgetId);
+				turnstileWidgetId = null;
+			} catch (e) {
+				console.warn("Failed to remove existing turnstile widget:", e);
+			}
+		}
 
-  <CallToAction />
-</Base>
+		// Clear the widget container
+		widget.innerHTML = "";
+
+		// Render new widget
+		try {
+			const sitekey = widget.getAttribute("data-sitekey");
+			const theme = widget.getAttribute("data-theme") as "light" | "dark" | "auto" | null;
+			const size = widget.getAttribute("data-size") as "normal" | "compact" | "flexible" | null;
+			
+			const widgetId = turnstile.render("#turnstile-widget", {
+				sitekey: sitekey || "",
+				theme: theme || "dark",
+				size: size || "flexible",
+			});
+			
+			turnstileWidgetId = widgetId ?? null;
+		} catch (e) {
+			console.error("Failed to render turnstile widget:", e);
+		}
+	}
+
+	// Setup form submission handler
+	function setupFormHandler() {
+		const form = document.getElementById("marketing-form") as HTMLFormElement;
+		const submitButton = document.getElementById("submit-button") as HTMLButtonElement;
+		const sendIcon = document.getElementById("send-icon") as HTMLElement;
+		const loaderIcon = document.getElementById("loader-icon") as HTMLElement;
+		const buttonText = document.getElementById("button-text") as HTMLSpanElement;
+		const consentCheckbox = form?.querySelector(
+			'#confirm-policies'
+		) as HTMLInputElement;
+
+		if (!form) return;
+
+		// Remove existing event listener if it exists
+		if (formSubmitHandler) {
+			form.removeEventListener("submit", formSubmitHandler);
+		}
+
+		// Toggle loading state
+		const setLoading = (isLoading: boolean) => {
+			if (!submitButton || !sendIcon || !loaderIcon || !buttonText) return;
+			
+			submitButton.disabled = isLoading;
+			if (isLoading) {
+				sendIcon.classList.add("hidden");
+				loaderIcon.classList.remove("hidden");
+				buttonText.textContent = "Submitting...";
+			} else {
+				sendIcon.classList.remove("hidden");
+				loaderIcon.classList.add("hidden");
+				buttonText.textContent = "Sign Up";
+			}
+		};
+
+		// Update submit button state based on checkbox
+		const updateSubmitButtonState = () => {
+			if (submitButton && consentCheckbox) {
+				submitButton.disabled = !consentCheckbox.checked;
+			}
+		};
+
+		// Add change listener to checkbox
+		if (consentCheckbox) {
+			consentCheckbox.addEventListener("change", updateSubmitButtonState);
+			// Set initial state
+			updateSubmitButtonState();
+		}
+
+		// Create the handler function
+		formSubmitHandler = (e: Event) => {
+			// Client-side validation before submission
+			const turnstileResponse = form.querySelector(
+				'input[name="cf-turnstile-response"]'
+			) as HTMLInputElement;
+
+			if (!turnstileResponse || !turnstileResponse.value) {
+				e.preventDefault();
+				alert("Please complete the CAPTCHA verification before submitting.");
+				return;
+			}
+
+			// Validate consent checkbox
+			if (!consentCheckbox || !consentCheckbox.checked) {
+				e.preventDefault();
+				alert("Please confirm that you consent to providing your information.");
+				return;
+			}
+
+			// Validate email format
+			const emailInput = form.querySelector(
+				'input[name="email"]'
+			) as HTMLInputElement;
+			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+			
+			if (emailInput && !emailRegex.test(emailInput.value)) {
+				e.preventDefault();
+				alert("Please enter a valid email address.");
+				return;
+			}
+
+			// All validation passed, show loading state
+			setLoading(true);
+		};
+
+		// Add the event listener
+		form.addEventListener("submit", formSubmitHandler);
+	}
+
+	// Initialize Turnstile with polling for script availability
+	function setupTurnstile() {
+		if (typeof turnstile !== "undefined") {
+			initializeTurnstile();
+		} else {
+			// Poll for turnstile to be available
+			let attempts = 0;
+			const maxAttempts = 50; // 5 seconds max
+			const interval = setInterval(() => {
+				attempts++;
+				if (typeof turnstile !== "undefined") {
+					clearInterval(interval);
+					initializeTurnstile();
+				} else if (attempts >= maxAttempts) {
+					clearInterval(interval);
+					console.error("Turnstile failed to load");
+				}
+			}, 100);
+		}
+	}
+
+	// Initialize on page load
+	setupTurnstile();
+	setupFormHandler();
+</script>

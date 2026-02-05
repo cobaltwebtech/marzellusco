@@ -1,0 +1,15 @@
+---
+import CircleCheck from "@tabler/icons/filled/circle-check.svg";
+import Home from "@tabler/icons/outline/home.svg";
+import BaseLayout from "@/base/BaseLayout.astro";
+import { Button } from "@/components/starwind/button";
+---
+<BaseLayout title="Submission Received">
+  <section class="mx-auto max-w-2xl flex flex-col items-center justify-center space-y-4">
+    <CircleCheck class="text-green-500 size-16" />
+    <h1 class="text-4xl font-bold">You're Signed Up!</h1>
+    <p>Thanks for signing up to stay in the loop. We'll be in touch soon!</p>
+    <p>Be sure to keep an eye on your inbox for updates.</p>
+    <Button href="/"><Home class="size-6" />Go Back Home</Button>
+  </section>
+</BaseLayout>

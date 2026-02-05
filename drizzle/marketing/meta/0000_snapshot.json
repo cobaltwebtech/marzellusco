@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "cf919942-f7a9-4d62-90ed-61397530d53a",
+  "id": "3a28f8ed-5fbf-462c-8efa-88811b6c5bc5",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "submissions": {
@@ -14,8 +14,15 @@
           "notNull": true,
           "autoincrement": false
         },
-        "fullname": {
-          "name": "fullname",
+        "firstname": {
+          "name": "firstname",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "lastname": {
+          "name": "lastname",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -42,6 +49,13 @@
           "notNull": true,
           "autoincrement": false,
           "default": "(unixepoch())"
+        },
+        "klaviyo_profile_id": {
+          "name": "klaviyo_profile_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {},

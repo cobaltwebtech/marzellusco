@@ -92,18 +92,20 @@ const banner =
 							Sign up to be notified when we launch!
 						</CardDescription>
 					</CardHeader>
-					<CardContent class="text-left space-y-2 pb-4">
-						<div>
-							<Label for="fullname">Name <span class="text-error">*</span></Label>
-							<Input type="text" id="fullname" name="fullname" placeholder="Full Name" required />
+					<CardContent class="text-left space-y-2 py-4">
+						<div class="flex gap-2">
+							<div>
+								<Input type="text" id="firstname" name="firstname" placeholder="First Name" required />
+							</div>
+							<div>
+								<Input type="text" id="lastname" name="lastname" placeholder="Last Name" required />
+							</div>
 						</div>
 						<div>
-							<Label for="email">Email <span class="text-error">*</span></Label>
-							<Input type="email" id="email" name="email" placeholder="email@example.com" required />
+							<Input type="email" id="email" name="email" placeholder="Email Address" required />
 						</div>
 						<div>
-							<Label for="phone">Mobile Number</Label>
-							<Input type="tel" id="phone" name="phone" placeholder="123-456-7890" />
+							<Input type="tel" id="phone" name="phone" placeholder="Mobile Number" />
 						</div>
 						<div class="space-y-2">
 							<Checkbox id="confirm-policies" name="confirm-policies" label="I consent to providing my information" required />
@@ -183,6 +185,38 @@ const banner =
 	let turnstileWidgetId: string | null = null;
 	let formSubmitHandler: ((e: Event) => void) | null = null;
 
+	/**
+	 * Formats a phone number to (XXX) XXX-XXXX display format
+	 * and validates it's a valid North American number
+	 */
+	function formatPhoneDisplay(value: string): string {
+		// Strip all non-digit characters
+		const digits = value.replace(/\D/g, "");
+		
+		// Remove leading 1 if present (country code)
+		const normalized = digits.startsWith("1") && digits.length > 10 
+			? digits.slice(1) 
+			: digits;
+		
+		// Format as (XXX) XXX-XXXX
+		if (normalized.length <= 3) {
+			return normalized;
+		} else if (normalized.length <= 6) {
+			return `(${normalized.slice(0, 3)}) ${normalized.slice(3)}`;
+		} else {
+			return `(${normalized.slice(0, 3)}) ${normalized.slice(3, 6)}-${normalized.slice(6, 10)}`;
+		}
+	}
+
+	/**
+	 * Validates phone number is valid for North America (10 or 11 digits)
+	 */
+	function isValidPhoneNumber(value: string): boolean {
+		if (!value) return true; // Phone is optional
+		const digits = value.replace(/\D/g, "");
+		return digits.length === 10 || (digits.length === 11 && digits.startsWith("1"));
+	}
+
 	// Function to initialize Turnstile widget
 	function initializeTurnstile() {
 		const widget = document.getElementById("turnstile-widget");
@@ -232,8 +266,25 @@ const banner =
 		const consentCheckbox = form?.querySelector(
 			'#confirm-policies'
 		) as HTMLInputElement;
+		const phoneInput = form?.querySelector('#phone') as HTMLInputElement;
 
 		if (!form) return;
+
+		// Add live phone formatting
+		if (phoneInput) {
+			phoneInput.addEventListener("input", (e) => {
+				const target = e.target as HTMLInputElement;
+				const cursorPos = target.selectionStart || 0;
+				const oldLength = target.value.length;
+				
+				target.value = formatPhoneDisplay(target.value);
+				
+				// Adjust cursor position after formatting
+				const newLength = target.value.length;
+				const newPos = cursorPos + (newLength - oldLength);
+				target.setSelectionRange(newPos, newPos);
+			});
+		}
 
 		// Remove existing event listener if it exists
 		if (formSubmitHandler) {
@@ -299,6 +350,17 @@ const banner =
 			if (emailInput && !emailRegex.test(emailInput.value)) {
 				e.preventDefault();
 				alert("Please enter a valid email address.");
+				return;
+			}
+
+			// Validate phone number format (if provided)
+			const phoneInputField = form.querySelector(
+				'input[name="phone"]'
+			) as HTMLInputElement;
+			
+			if (phoneInputField && phoneInputField.value && !isValidPhoneNumber(phoneInputField.value)) {
+				e.preventDefault();
+				alert("Please enter a valid 10-digit phone number.");
 				return;
 			}
 

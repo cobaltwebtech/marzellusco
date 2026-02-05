@@ -1,6 +1,13 @@
 import { ActionError, defineAction } from "astro:actions";
 import { z } from "astro:schema";
 import { drizzle } from "drizzle-orm/d1";
+import {
+	ApiKeySession,
+	ListEnum,
+	ProfileEnum,
+	ProfileSubscriptionBulkCreateJobEnum,
+	ProfilesApi,
+} from "klaviyo-api";
 import { customAlphabet } from "nanoid";
 import { submissions } from "@/db/marketing-schema";
 
@@ -10,9 +17,35 @@ const generateId = customAlphabet(
 	16,
 );
 
+/**
+ * Formats a phone number to E.164 format for Klaviyo
+ * Handles North American numbers: (123) 456-7890, 123-456-7890, 1234567890, etc.
+ * Returns the formatted number or null if invalid
+ */
+function formatPhoneToE164(phone: string | undefined): string | null {
+	if (!phone) return null;
+
+	// Strip all non-digit characters
+	const digits = phone.replace(/\D/g, "");
+
+	// Handle 10-digit numbers (add +1 country code)
+	if (digits.length === 10) {
+		return `+1${digits}`;
+	}
+
+	// Handle 11-digit numbers starting with 1 (US/Canada country code)
+	if (digits.length === 11 && digits.startsWith("1")) {
+		return `+${digits}`;
+	}
+
+	// Invalid phone number length for North America
+	return null;
+}
+
 // Validate form inputs with Zod
 const marketingFormSchema = z.object({
-	fullname: z.string().min(1, "Full name is required"),
+	firstname: z.string().min(1, "First name is required"),
+	lastname: z.string().min(1, "Last name is required"),
 	email: z.string().email("Invalid email address"),
 	phone: z.string().optional(),
 	"confirm-policies": z
@@ -72,13 +105,91 @@ export const server = {
 			// Initialize database connection
 			const db = drizzle(context.locals.runtime.env.DB_MARKETING);
 
-			// Insert form data into database
+			// Submit to Klaviyo first to get the profile ID
+			let klaviyoProfileId: string | null = null;
+
+			try {
+				const session = new ApiKeySession(import.meta.env.KLAVIYO_API_KEY);
+				const profilesApi = new ProfilesApi(session);
+
+				// Format phone to E.164 for Klaviyo
+				const formattedPhone = formatPhoneToE164(input.phone);
+
+				// Create or update profile with all fields (firstName, lastName, etc.)
+				// This returns the profile data including the Klaviyo profile ID
+				const profileResponse = await profilesApi.createOrUpdateProfile({
+					data: {
+						type: ProfileEnum.Profile,
+						attributes: {
+							email: input.email,
+							firstName: input.firstname,
+							lastName: input.lastname,
+							...(formattedPhone && { phoneNumber: formattedPhone }),
+						},
+					},
+				});
+
+				// Extract Klaviyo profile ID from response
+				klaviyoProfileId = profileResponse.body.data.id ?? null;
+
+				// Build subscriptions object - always include email, add SMS if valid phone provided
+				const subscriptions = {
+					email: {
+						marketing: {
+							consent: "SUBSCRIBED" as const,
+						},
+					},
+					...(formattedPhone && {
+						sms: {
+							marketing: {
+								consent: "SUBSCRIBED" as const,
+							},
+						},
+					}),
+				};
+
+				// Subscribe profile to marketing channels and add to list "RDWzRd"
+				await profilesApi.bulkSubscribeProfiles({
+					data: {
+						type: ProfileSubscriptionBulkCreateJobEnum.ProfileSubscriptionBulkCreateJob,
+						attributes: {
+							profiles: {
+								data: [
+									{
+										type: ProfileEnum.Profile,
+										attributes: {
+											email: input.email,
+											...(formattedPhone && { phoneNumber: formattedPhone }),
+											subscriptions,
+										},
+									},
+								],
+							},
+						},
+						relationships: {
+							list: {
+								data: {
+									type: ListEnum.List,
+									id: "RDWzRd",
+								},
+							},
+						},
+					},
+				});
+			} catch (error) {
+				console.error("Klaviyo submission error:", error);
+				// Continue with D1 insert even if Klaviyo fails
+			}
+
+			// Insert form data into database (with Klaviyo profile ID if available)
 			try {
 				await db.insert(submissions).values({
 					id: generateId(),
-					fullname: input.fullname,
+					firstname: input.firstname,
+					lastname: input.lastname,
 					email: input.email,
 					phone: input.phone,
+					klaviyoProfileId,
 				});
 			} catch (error) {
 				console.error("Database insertion error:", error);
@@ -90,6 +201,7 @@ export const server = {
 
 			return {
 				success: true,
+				klaviyoProfileId,
 			};
 		},
 	}),

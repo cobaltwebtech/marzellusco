@@ -109,7 +109,7 @@
 	--info-foreground: var(--color-sky-950);
 	--success: var(--color-green-300);
 	--success-foreground: var(--color-green-950);
-	--warning: var(--color-amber-300);
+	--warning: var(--color-amber-600);
 	--warning-foreground: var(--color-amber-950);
 	--error: var(--color-red-700);
 	--error-foreground: var(--color-neutral-50);

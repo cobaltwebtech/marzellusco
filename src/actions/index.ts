@@ -124,7 +124,7 @@ export const server = {
 							email: input.email,
 							firstName: input.firstname,
 							lastName: input.lastname,
-							...(formattedPhone && { phoneNumber: formattedPhone }),
+							phoneNumber: formattedPhone ?? undefined,
 						},
 					},
 				});
@@ -159,7 +159,7 @@ export const server = {
 										type: ProfileEnum.Profile,
 										attributes: {
 											email: input.email,
-											...(formattedPhone && { phoneNumber: formattedPhone }),
+											phoneNumber: formattedPhone ?? undefined,
 											subscriptions,
 										},
 									},

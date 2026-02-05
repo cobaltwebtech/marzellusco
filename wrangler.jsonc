@@ -2,6 +2,9 @@
 	"main": "dist/_worker.js/index.js",
 	"name": "marzellusco",
 	"compatibility_date": "2026-01-20",
+	"placement": {
+    "mode": "smart"
+  },
 	"observability": {
 		"enabled": true
 	},
@@ -25,6 +28,7 @@
 	],
 	"vars": {
     "UMAMI_ID": "3d27ec82-18d3-4c8d-8e02-918d38856793",
-    "PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAABigvVfdn9-L_sZY"
+    "PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAABigvVfdn9-L_sZY",
+		"PUBLIC_CLOUDINARY_CLOUD_NAME": "cobalt"
   }
 }

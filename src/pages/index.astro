@@ -1,10 +1,12 @@
 ---
+
 export const prerender = false;
 
 import { actions, isInputError } from "astro:actions";
 import OctagonAlert from "@tabler/icons/outline/alert-octagon.svg";
 import Loader2 from "@tabler/icons/outline/loader-2.svg";
 import Send from "@tabler/icons/outline/send.svg";
+import { CldImage } from "astro-cloudinary";
 import ComingSoonGraphic from "@/assets/coming-soon-2.png";
 import BaseLayout from "@/base/BaseLayout.astro";
 import { Button } from "@/components/starwind/button";
@@ -27,7 +29,6 @@ import {
 } from "@/components/starwind/dialog";
 import { Input } from "@/components/starwind/input";
 import { Label } from "@/components/starwind/label";
-import { Video } from "@/components/starwind/video";
 
 const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 
@@ -63,98 +64,90 @@ if (result?.error) {
 		errorMessage = result.error.message;
 	}
 }
+const banner =
+  "marzellus/marzellus-banner.avif";
 ---
 
 <BaseLayout>
-	<section slot="hero" class="animate-fade-in">
-		<Video 
-			src="https://iframe.mediadelivery.net/embed/367279/b953db3b-2dc2-4951-b056-f46011ce5b31?autoplay=true&loop=true&muted=true&preload=true&responsive=true"
-			autoplay={false} 
-			loop={true} 
-			muted={true}
-			controls={true}
+	<section class="w-full max-w-5xl mx-auto relative">
+		<div class="w-full aspect-2/3 min-h-screen">
+			<CldImage
+				class="w-full h-full object-cover"
+				src={banner}
+				alt="Marzellus banner image"
+				draggable="false"
+				format="avif"
+				width={1024}
+				height={1536}
 			/>
-	</section>
-	<section class="py-8 space-y-8 text-center">
-		<h2 class="text-3xl font-bold">The New Marzellus is Coming Soon</h2>
-		<p>Sign up to stay in the loop of our brand new launch.</p>
-		<Card class="max-w-xl pt-0">
-			<div class="p-4 rounded-t-xl">
-				<img
-					src={ComingSoonGraphic.src}
-					alt="Coming soon graphic"
-					class="mx-auto w-1/4 object-cover"
-				/>
-			</div>
-			<form id="marketing-form" method="POST" action={actions.storeMarketingForm}>
-				<CardHeader>
-					<CardTitle>Sign Up to Stay in the Loop</CardTitle>
-					<CardDescription>
-						A brand-new Marzellus is coming soon. Sign up to be the first to know when we launch!
-					</CardDescription>
-				</CardHeader>
-				<CardContent class="text-left space-y-4 pb-4">
-					<div>
-						<Label for="fullname">Name <span class="text-error">*</span></Label>
-						<Input type="text" id="fullname" name="fullname" placeholder="Full Name" required />
-					</div>
-					<div>
-						<Label for="email">Email <span class="text-error">*</span></Label>
-						<Input type="email" id="email" name="email" placeholder="email@example.com" required />
-					</div>
-					<div>
-						<Label for="phone">Mobile Number</Label>
-						<Input type="tel" id="phone" name="phone" placeholder="123-456-7890" />
-					</div>
-					<div class="space-y-2">
-						<Checkbox id="confirm-policies" name="confirm-policies" label="I consent to providing my information" required />
-						<p class="text-xs text-muted-foreground font-light">
-							By signing up you consent to receive marketing communication from Marzellus.
-						</p>
-						<DialogTrigger for="consent-dialog" asChild>
-							<p class="text-xs underline hover:cursor-pointer">Read our Consent Notice</p>
-						</DialogTrigger>
-						<Dialog id="consent-dialog">
-							<DialogContent>
-								<DialogHeader>
-									<DialogTitle>Consent Notice</DialogTitle>
-									<DialogDescription>
-										Hey, we hate fine print too but we want you to be aware of how we use your info and that we value your privacy as well.
-									</DialogDescription>
-								</DialogHeader>
-								<div class="py-4 space-y-2 text-xs font-light">
-									<p>
-										By submitting this form, you agree that we may collect and use your name, email address, and mobile number to send you marketing communications about our products, including product launches, promotions, and related updates.
-									</p>
-									<p>
-										You acknowledge that these communications may be sent by email and, if you provide your mobile number, by text message/SMS and/or phone call. Message and data rates may apply.	You may opt out of marketing emails at any time by clicking the unsubscribe link in our emails. You may opt out of SMS message notifications by replying "STOP". If you provide a mobile phone number you agree to receive recurring marketing text messages at the number provided. Consent is not a condition of purchase.
-									</p>
-									<p>
-										Your information is stored securely, will not sell it, and will only share it with trusted service providers as needed to send these communications or operate our business.
-									</p>
-									<p>
-										For questions about how we handle your information, or to exercise your privacy choices, you may contact us at info@marzellusco.com.
-									</p>
-								</div>
-							</DialogContent>
-						</Dialog>
-					</div>
-					{errorMessage && (
-						<div
-							id="error-message"
-							class="rounded-lg border-2 border-orange-400 bg-red-700 p-3 font-bold text-white"
-						>
-							<div class="flex items-center justify-center gap-2">
-								<OctagonAlert class="size-5" />
-								<span>{errorMessage}</span>
-							</div>
+		</div>
+		<div class="absolute inset-0 flex flex-col justify-center items-center">
+			<Card size="sm" class="bg-card/65 max-w-90 md:max-w-lg">
+				<form id="marketing-form" method="POST" action={actions.storeMarketingForm}>
+					<CardHeader>
+						<CardTitle>
+							<h1 class="text-2xl font-bold text-center">The New Marzellus is Coming Soon</h1>
+						</CardTitle>
+						<CardDescription class="text-center text-foreground">
+							Sign up to be notified when we launch!
+						</CardDescription>
+					</CardHeader>
+					<CardContent class="text-left space-y-2 pb-4">
+						<div>
+							<Label for="fullname">Name <span class="text-error">*</span></Label>
+							<Input type="text" id="fullname" name="fullname" placeholder="Full Name" required />
 						</div>
-					)}
-				</CardContent>
-				<CardFooter class="flex flex-col gap-4">
-					<!-- Cloudflare Turnstile widget -->
-					<div class="space-y-2">
-						<p class="text-xs text-muted-foreground font-light text-left">
+						<div>
+							<Label for="email">Email <span class="text-error">*</span></Label>
+							<Input type="email" id="email" name="email" placeholder="email@example.com" required />
+						</div>
+						<div>
+							<Label for="phone">Mobile Number</Label>
+							<Input type="tel" id="phone" name="phone" placeholder="123-456-7890" />
+						</div>
+						<div class="space-y-2">
+							<Checkbox id="confirm-policies" name="confirm-policies" label="I consent to providing my information" required />
+							<DialogTrigger for="consent-dialog" asChild>
+								<p class="text-xs underline hover:cursor-pointer">Read our Consent Notice</p>
+							</DialogTrigger>
+							<Dialog id="consent-dialog">
+								<DialogContent>
+									<DialogHeader>
+										<DialogTitle>Consent Notice</DialogTitle>
+										<DialogDescription>
+											Hey, we hate fine print too but we want you to be aware of how we use your info and that we value your privacy as well.
+										</DialogDescription>
+									</DialogHeader>
+									<div class="py-4 space-y-2 text-xs font-light">
+										<p>
+											By submitting this form, you agree that we may collect and use your name, email address, and mobile number to send you marketing communications about our products, including product launches, promotions, and related updates.
+										</p>
+										<p>
+											You acknowledge that these communications may be sent by email and, if you provide your mobile number, by text message/SMS and/or phone call. Message and data rates may apply.	You may opt out of marketing emails at any time by clicking the unsubscribe link in our emails. You may opt out of SMS message notifications by replying "STOP". If you provide a mobile phone number you agree to receive recurring marketing text messages at the number provided. Consent is not a condition of purchase.
+										</p>
+										<p>
+											Your information is stored securely, will not sell it, and will only share it with trusted service providers as needed to send these communications or operate our business.
+										</p>
+										<p>
+											For questions about how we handle your information, or to exercise your privacy choices, you may contact us at info@marzellusco.com.
+										</p>
+									</div>
+								</DialogContent>
+							</Dialog>
+						</div>
+						{errorMessage && (
+							<div
+								id="error-message"
+								class="rounded-lg border-2 border-orange-400 bg-red-700 p-3 font-bold text-white"
+							>
+								<div class="flex items-center justify-center gap-2">
+									<OctagonAlert class="size-5" />
+									<span>{errorMessage}</span>
+								</div>
+							</div>
+						)}
+						<!-- Cloudflare Turnstile widget -->
+						<p class="text-[10px] font-light text-left">
 							We're just checking that you're a real human filling out this form.
 							<br />Bad bots stay away!
 						</p>
@@ -164,18 +157,18 @@ if (result?.error) {
 							data-size="flexible"
 						>
 						</div>
-					</div>
-					<Button type="submit" id="submit-button" class="w-full">
-						<Send class="size-5" id="send-icon" />
-						<Loader2
-							class="hidden size-5 animate-spin"
-							id="loader-icon"
-						/>
-						<span id="button-text">Sign Up</span>
-					</Button>
-				</CardFooter>
-			</form>
-		</Card>
+						<Button type="submit" id="submit-button" class="w-full">
+							<Send class="size-5" id="send-icon" />
+							<Loader2
+								class="hidden size-5 animate-spin"
+								id="loader-icon"
+							/>
+							<span id="button-text">Sign Up</span>
+						</Button>
+					</CardContent>
+				</form>
+			</Card>
+		</div>
 	</section>
 </BaseLayout>
 

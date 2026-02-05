@@ -105,15 +105,15 @@ export const server = {
 			// Initialize database connection
 			const db = drizzle(context.locals.runtime.env.DB_MARKETING);
 
-			// Format phone to E.164 format for Klaviyo and database storage
-			const formattedPhone = formatPhoneToE164(input.phone);
-
 			// Submit to Klaviyo first to get the profile ID
 			let klaviyoProfileId: string | null = null;
 
 			try {
 				const session = new ApiKeySession(import.meta.env.KLAVIYO_API_KEY);
 				const profilesApi = new ProfilesApi(session);
+
+				// Format phone to E.164 for Klaviyo
+				const formattedPhone = formatPhoneToE164(input.phone);
 
 				// Create or update profile with all fields (firstName, lastName, etc.)
 				// This returns the profile data including the Klaviyo profile ID
@@ -124,7 +124,7 @@ export const server = {
 							email: input.email,
 							firstName: input.firstname,
 							lastName: input.lastname,
-							phoneNumber: formattedPhone ?? undefined,
+							...(formattedPhone && { phoneNumber: formattedPhone }),
 						},
 					},
 				});
@@ -159,7 +159,7 @@ export const server = {
 										type: ProfileEnum.Profile,
 										attributes: {
 											email: input.email,
-											phoneNumber: formattedPhone ?? undefined,
+											...(formattedPhone && { phoneNumber: formattedPhone }),
 											subscriptions,
 										},
 									},
@@ -188,7 +188,7 @@ export const server = {
 					firstname: input.firstname,
 					lastname: input.lastname,
 					email: input.email,
-					phone: formattedPhone,
+					phone: input.phone,
 					klaviyoProfileId,
 				});
 			} catch (error) {

@@ -1,7 +1,7 @@
 import Video, { video } from "./Video.astro";
 
 const VideoVariants = {
-  video,
+	video,
 };
 
 export { Video, VideoVariants };

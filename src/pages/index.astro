@@ -2,7 +2,6 @@
 export const prerender = false;
 
 import { actions, isInputError } from "astro:actions";
-import { Image } from "astro:assets";
 import OctagonAlert from "@tabler/icons/outline/alert-octagon.svg";
 import Loader2 from "@tabler/icons/outline/loader-2.svg";
 import Send from "@tabler/icons/outline/send.svg";
@@ -81,8 +80,8 @@ if (result?.error) {
 		<p>Sign up to stay in the loop of our brand new launch.</p>
 		<Card class="max-w-xl pt-0">
 			<div class="p-4 rounded-t-xl">
-				<Image
-					src={ComingSoonGraphic}
+				<img
+					src={ComingSoonGraphic.src}
 					alt="Coming soon graphic"
 					class="mx-auto w-1/4 object-cover"
 				/>

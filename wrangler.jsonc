@@ -1,6 +1,6 @@
 {
 	"main": "dist/_worker.js/index.js",
-	"name": "marzellus",
+	"name": "marzellusco",
 	"compatibility_date": "2026-01-20",
 	"observability": {
 		"enabled": true

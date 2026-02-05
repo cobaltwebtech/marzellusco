@@ -17,7 +17,10 @@ const marketingFormSchema = z.object({
 	phone: z.string().optional(),
 	"confirm-policies": z
 		.string()
-		.refine((val) => val === "on", "You must consent to providing your information"),
+		.refine(
+			(val) => val === "on",
+			"You must consent to providing your information",
+		),
 	"cf-turnstile-response": z
 		.string()
 		.min(1, "CAPTCHA verification is required"),

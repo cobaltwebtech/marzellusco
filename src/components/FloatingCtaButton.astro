@@ -1,0 +1,65 @@
+---
+import Coin from "@tabler/icons/filled/coin.svg";
+
+export interface Props {
+  buttonText?: string;
+  dialogId?: string;
+}
+
+const { buttonText = "Subscribe & Save", dialogId = "klaviyo-cta-dialog" } = Astro.props;
+---
+
+<button
+  id="floating-cta-button"
+  data-trigger-dialog={dialogId}
+  class="fixed bottom-8 right-8 z-40 flex items-center gap-2 px-6 py-3 bg-yellow-400 text-primary rounded-full font-semibold shadow-lg hover:bg-yellow-400/90 hover:shadow-xl transition-all duration-300 ease-out hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 active:scale-95"
+  aria-label={buttonText}
+  type="button"
+>
+  <span>{buttonText}</span>
+  <Coin class="size-8" />
+</button>
+
+<script define:vars={{ dialogId }}>
+  const button = document.getElementById("floating-cta-button");
+  
+  if (button) {
+    const openDialog = () => {
+      // Find the wrapper div by ID
+      const dialogWrapper = document.getElementById(dialogId);
+      
+      if (dialogWrapper) {
+        // Dispatch the custom event that Starwind's DialogHandler listens for
+        dialogWrapper.dispatchEvent(new CustomEvent("dialog:open"));
+      }
+    };
+
+    // Wait for the dialog to be mounted
+    const setupListener = () => {
+      const dialogWrapper = document.getElementById(dialogId);
+      
+      if (dialogWrapper) {
+        // Dialog is ready, add click listener
+        button.addEventListener("click", openDialog);
+      } else {
+        // Dialog not ready yet, try again
+        requestAnimationFrame(setupListener);
+      }
+    };
+
+    // Start the setup
+    setupListener();
+  }
+
+  // Optional: Hide button on small screens
+  const updateButtonVisibility = () => {
+    if (button) {
+      // You can customize this breakpoint if needed
+      button.classList.toggle("hidden", window.innerWidth < 768);
+    }
+  };
+
+  // Uncomment the lines below if you want to hide on mobile
+  // updateButtonVisibility();
+  // window.addEventListener("resize", updateButtonVisibility);
+</script>

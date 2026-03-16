@@ -2,8 +2,10 @@
 
 import { ClientRouter } from "astro:transitions";
 import { AstroFont } from "astro-font";
+import FloatingCtaButton from "@/components/FloatingCtaButton.astro";
 import TwSizeIndicator from "@/components/TwSizeIndicator.astro";
 import config from "@/config/config.json";
+import KlaviyoForm from "@/layouts/components/KlaviyoForm.astro";
 import { plainify } from "@/lib/utils/textConverter";
 import Footer from "@/partials/Footer.astro";
 import Header from "@/partials/Header.astro";
@@ -85,6 +87,7 @@ const {
     </script>
     <!-- Umami Analytics script tag -->
     <script
+      is:inline
       defer
       src="https://umami.cobaltweb.tech/script.js"
       data-website-id={umamiId}></script>
@@ -104,6 +107,12 @@ const {
       })(window, document, "script", "dataLayer", "GTM-5F9863D3");
       // biome-ignore-end lint: Ignore Google Tag Manager script
     </script>
+
+    <!-- Klaviyo Analytics script -->
+    <script 
+      is:inline 
+      async
+      src="https://static.klaviyo.com/onsite/js/SaaSi6/klaviyo.js"></script>
 
     <!-- Preconnect third party resources -->
     {
@@ -208,5 +217,11 @@ const {
       <slot />
     </main>
     <Footer />
+    
+    <!-- Floating CTA Button with Klaviyo Form Dialog -->
+    <div id="cta-portal">
+      <KlaviyoForm />
+      <FloatingCtaButton buttonText="GET 10% OFF" />
+    </div>
   </body>
 </html>

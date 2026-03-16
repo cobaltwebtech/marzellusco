@@ -1,0 +1,12 @@
+---
+export const prerender = true;
+
+import { Content } from "@/content/policies/privacy-policy.md";
+import Base from "@/layouts/Base.astro";
+---
+
+<Base title="Privacy Policy | Marzellus">
+  <div class="container prose dark:prose-invert prose-sm mx-auto py-12 px-4">
+    <Content />
+  </div>
+</Base>

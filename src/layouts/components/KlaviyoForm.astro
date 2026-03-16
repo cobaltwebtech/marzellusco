@@ -1,0 +1,30 @@
+---
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/starwind/dialog";
+
+export interface Props {
+  dialogId?: string;
+}
+
+const { dialogId = "klaviyo-cta-dialog" } = Astro.props;
+---
+
+<Dialog id={dialogId}>
+  <DialogContent className="sm:max-w-md">
+    <DialogHeader>
+      <DialogTitle>Join Our Mailing List</DialogTitle>
+      <DialogDescription>
+        Subscribe to get special offers and updates delivered to your inbox.
+      </DialogDescription>
+    </DialogHeader>
+    <div class="w-full">
+      <!-- Klaviyo embed form -->
+      <div class="klaviyo-form-WgPPJ4"></div>
+    </div>
+  </DialogContent>
+</Dialog>

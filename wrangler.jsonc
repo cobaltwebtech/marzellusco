@@ -1,0 +1,36 @@
+{
+	"main": "dist/_worker.js/index.js",
+	"name": "marzellusco",
+	"compatibility_date": "2026-02-24",
+	"placement": {
+    "mode": "smart"
+  },
+	"observability": {
+		"enabled": true
+	},
+	"workers_dev": false,
+	"preview_urls": false,
+	"compatibility_flags": [
+		"nodejs_compat",
+		"global_fetch_strictly_public"
+	],
+	"assets": {
+		"binding": "ASSETS",
+		"directory": "./dist"
+	},
+	"d1_databases": [
+		{
+			"binding": "DB_MARKETING",
+			"database_name": "marzellus-marketing",
+			"database_id": "afe5264f-a282-45ae-8db5-79215254ddfd",
+			"migrations_dir": "./drizzle/marketing"
+		}
+	],
+	"vars": {
+    "UMAMI_ID": "3d27ec82-18d3-4c8d-8e02-918d38856793",
+    "PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAABigvVfdn9-L_sZY",
+		"PUBLIC_CLOUDINARY_CLOUD_NAME": "cobalt",
+		"PUBLIC_SHOPIFY_STORE_DOMAIN": "shop.marzellusco.com",
+		"PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN": "4096e9c61675bc49a9c1a754b9fc6903"
+  }
+}

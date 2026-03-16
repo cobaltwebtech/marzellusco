@@ -1,10 +1,10 @@
 ---
-import Logo from "@/components/Logo.astro";
-import menu from "@/config/menu.json";
-import config from "@/config/config.json";
-import ThemeSwitcher from "@/components/ThemeSwitcher.astro";
-import SearchBar from "@/functional-components/SearchBar";
 import Cart from "@/components/Cart.astro";
+import Logo from "@/components/Logo.astro";
+import ThemeSwitcher from "@/components/ThemeSwitcher.astro";
+import config from "@/config/config.json";
+import menu from "@/config/menu.json";
+import SearchBar from "@/functional-components/SearchBar";
 
 const { navigation_button, settings } = config;
 
@@ -281,6 +281,18 @@ const isParentActive = (children: any[]) => {
               ))
             }
           </ul>
+          {
+            navigation_button.enable && (
+              <li class="mt-4 mr-4 inline-block md:mr-6">
+                <a
+                  class="btn btn-outline-primary btn-sm"
+                  href={navigation_button.link}
+                >
+                  {navigation_button.label}
+                </a>
+              </li>
+            )
+          }
         </div>
       </div>
     </div>

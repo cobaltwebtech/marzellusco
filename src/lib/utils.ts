@@ -28,7 +28,7 @@ export const ensureStartsWith = (
 export const validateEnvironmentVariables = (): void => {
 	const requiredEnvironmentVariables = [
 		"PUBLIC_SHOPIFY_STORE_DOMAIN",
-		"SHOPIFY_STOREFRONT_ACCESS_TOKEN",
+		"PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN",
 	];
 	const missingEnvironmentVariables: string[] = [];
 

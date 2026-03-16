@@ -22,8 +22,8 @@
 
 	"navigation_button": {
 		"enable": true,
-		"label": "Shop Now",
-		"link": "/products"
+		"label": "Subscribe",
+		"link": "/subscribe"
 	},
 
 	"metadata": {

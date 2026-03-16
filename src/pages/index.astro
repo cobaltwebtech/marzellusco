@@ -1,15 +1,13 @@
 ---
-export const prerender = false;
-
 import { getEntry } from "astro:content";
 import FeaturedProducts from "@/components/FeaturedProducts.astro";
+import VideoHero from "@/components/VideoHero.astro";
 import config from "@/config/config.json";
 import CollectionsGrid from "@/functional-components/CollectionsGrid";
+import SlideShow from "@/functional-components/SlideShow";
 import Base from "@/layouts/Base.astro";
 import { getCollectionProducts, getCollections } from "@/lib/shopify";
 import CallToAction from "@/partials/CallToAction.astro";
-import SlideShow from "@/functional-components/SlideShow";
-import VideoHero from "@/components/VideoHero.astro";
 
 const { collections } = config.shopify;
 const collectionProducts = await getCollections();

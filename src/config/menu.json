@@ -1,0 +1,40 @@
+{
+	"main": [
+		{
+			"name": "Home",
+			"url": "/"
+		},
+		{
+			"name": "Products",
+			"url": "/products"
+		},
+		{
+			"name": "Contact",
+			"url": "/contact"
+		}
+	],
+	"footer": [
+		{
+			"name": "Products",
+			"url": "/products"
+		},
+		{
+			"name": "Contact",
+			"url": "/contact"
+		},		
+		{
+			"name": "Subscribe",
+			"url": "/subscribe"
+		}
+	],
+	"footerCopyright": [
+		{
+			"name": "Privacy Policy",
+			"url": "/privacy-policy"
+		},
+		{
+			"name": "Return Policy",
+			"url": "/return-policy"
+		}
+	]
+}

@@ -1,15 +1,19 @@
 ---
+export const prerender = true;
+
 import CircleCheck from "@tabler/icons/filled/circle-check.svg";
 import Home from "@tabler/icons/outline/home.svg";
-import BaseLayout from "@/base/BaseLayout.astro";
 import { Button } from "@/components/starwind/button";
+import Base from "@/layouts/Base.astro";
 ---
-<BaseLayout title="Submission Received">
-  <section class="mx-auto max-w-2xl px-4 flex flex-col items-center justify-center space-y-4 text-center">
-    <CircleCheck class="text-green-500 size-16" />
-    <h1 class="text-4xl font-bold">You're Signed Up!</h1>
-    <p>Thanks for signing up to stay in the loop. We'll be in touch soon!</p>
-    <p>Be sure to keep an eye on your inbox for updates.</p>
-    <Button href="/"><Home class="size-6" />Go Back Home</Button>
+<Base title="Submission Received">
+  <section class="mx-auto max-w-2xl min-h-screen px-4 flex flex-col items-center justify-center space-y-4 text-center">
+    <div class="bg-theme-light dark:bg-darkmode-theme-light p-8 rounded-lg shadow-md space-y-6">
+      <CircleCheck class="text-green-500 size-16 mx-auto" />
+      <h1 class="text-4xl font-bold">You're Signed Up!</h1>
+      <p>Thanks for signing up to stay in the loop. We'll be in touch soon!</p>
+      <p>Be sure to keep an eye on your inbox for updates.</p>
+      <Button href="/"><Home class="size-6" />Go Back Home</Button>
+    </div>
   </section>
-</BaseLayout>
+</Base>

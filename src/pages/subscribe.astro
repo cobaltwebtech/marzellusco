@@ -1,0 +1,394 @@
+---
+import { actions, isInputError } from "astro:actions";
+import OctagonAlert from "@tabler/icons/outline/alert-octagon.svg";
+import Loader2 from "@tabler/icons/outline/loader-2.svg";
+import Send from "@tabler/icons/outline/send.svg";
+import { CldImage } from "astro-cloudinary";
+import { Button } from "@/components/starwind/button";
+import {
+  Card,
+	CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/starwind/card";
+import { Checkbox } from "@/components/starwind/checkbox";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/starwind/dialog";
+import { Input } from "@/components/starwind/input";
+import Base from "@/layouts/Base.astro";
+
+const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
+
+// Handle redirect on successful form submission
+const result = Astro.getActionResult(actions.storeMarketingForm);
+if (result && !result.error) {
+	return Astro.redirect("/submission-received");
+}
+
+// Check for errors to display
+let errorMessage: string | null = null;
+if (result?.error) {
+	if (isInputError(result.error)) {
+		// For validation errors, extract all field-level error messages from Zod
+		const fieldErrors = result.error.fields;
+		const errorMessages: string[] = [];
+
+		// Collect all field errors
+		for (const [messages] of Object.entries(fieldErrors)) {
+			if (messages && Array.isArray(messages) && messages.length > 0) {
+				// Join multiple errors for the same field with commas
+				errorMessages.push((messages as string[]).join(", "));
+			}
+		}
+
+		// Display all errors or a fallback message
+		errorMessage =
+			errorMessages.length > 0
+				? errorMessages.join(" • ")
+				: "Please check your form for errors and try again.";
+	} else {
+		// For non-validation errors, display the error message
+		errorMessage = result.error.message;
+	}
+}
+const banner =
+  "marzellus/marzellus-banner.avif";
+---
+
+<Base>
+	<section class="w-full max-w-5xl mx-auto relative">
+		<div class="w-full aspect-2/3 min-h-screen">
+			<CldImage
+				class="w-full h-full object-cover"
+				src={banner}
+				alt="Marzellus banner image"
+				draggable="false"
+				format="avif"
+				width={1024}
+				height={1536}
+			/>
+		</div>
+		<div class="absolute inset-0 flex flex-col justify-center items-center">
+			<Card size="sm" class="bg-black/65 max-w-90 md:max-w-lg text-white">
+				<form id="marketing-form" method="POST" action={actions.storeMarketingForm}>
+					<CardHeader>
+						<CardTitle>
+							<h1 class="text-2xl font-bold text-center">Stay in the Loop</h1>
+						</CardTitle>
+						<CardDescription class="text-center text-foreground">
+							Subscribe to our email and SMS list
+						</CardDescription>
+					</CardHeader>
+					<CardContent class="text-left space-y-2 py-4">
+						<div class="flex gap-2">
+							<div>
+								<Input type="text" id="firstname" class="text-black" name="firstname" placeholder="First Name" required />
+							</div>
+							<div>
+								<Input type="text" id="lastname" class="text-black" name="lastname" placeholder="Last Name" required />
+							</div>
+						</div>
+						<div>
+							<Input type="email" id="email" class="text-black" name="email" placeholder="Email Address" required />
+						</div>
+						<div>
+							<Input type="tel" id="phone" class="text-black" name="phone" placeholder="Mobile Number" />
+						</div>
+						<div class="space-y-2">
+							<Checkbox id="confirm-policies" name="confirm-policies" label="I consent to providing my information" required />
+							<DialogTrigger for="consent-dialog" asChild>
+								<p class="text-xs underline hover:cursor-pointer">Read our Consent Notice</p>
+							</DialogTrigger>
+							<Dialog id="consent-dialog">
+								<DialogContent>
+									<DialogHeader>
+										<DialogTitle>Consent Notice</DialogTitle>
+										<DialogDescription>
+											Hey, we hate fine print too but we want you to be aware of how we use your info and that we value your privacy as well.
+										</DialogDescription>
+									</DialogHeader>
+									<div class="py-4 space-y-2 text-xs font-light">
+										<p>
+											By submitting this form, you agree that we may collect and use your name, email address, and mobile number to send you marketing communications about our products, including product launches, promotions, and related updates.
+										</p>
+										<p>
+											You acknowledge that these communications may be sent by email and, if you provide your mobile number, by text message/SMS and/or phone call. Message and data rates may apply.	You may opt out of marketing emails at any time by clicking the unsubscribe link in our emails. You may opt out of SMS message notifications by replying "STOP". If you provide a mobile phone number you agree to receive recurring marketing text messages at the number provided. Consent is not a condition of purchase.
+										</p>
+										<p>
+											Your information is stored securely, will not sell it, and will only share it with trusted service providers as needed to send these communications or operate our business.
+										</p>
+										<p>
+											For questions about how we handle your information, or to exercise your privacy choices, you may contact us at info@marzellusco.com.
+										</p>
+									</div>
+								</DialogContent>
+							</Dialog>
+						</div>
+						{errorMessage && (
+							<div
+								id="error-message"
+								class="rounded-lg border-2 border-orange-400 bg-red-700 p-3 font-bold text-white"
+							>
+								<div class="flex items-center justify-center gap-2">
+									<OctagonAlert class="size-5" />
+									<span>{errorMessage}</span>
+								</div>
+							</div>
+						)}
+						<!-- Cloudflare Turnstile widget -->
+						<p class="text-[10px] font-light text-left">
+							We're just checking that you're a real human filling out this form.
+							<br />Bad bots stay away!
+						</p>
+						<div
+							id="turnstile-widget"
+							data-sitekey={turnstileSiteKey}
+							data-size="flexible"
+						>
+						</div>
+						<Button type="submit" id="submit-button" class="w-full bg-neutral-100 text-black">
+							<Send class="size-5" id="send-icon" />
+							<Loader2
+								class="hidden size-5 animate-spin"
+								id="loader-icon"
+							/>
+							<span id="button-text">Subscribe</span>
+						</Button>
+					</CardContent>
+				</form>
+			</Card>
+		</div>
+	</section>
+</Base>
+
+<!-- Import and render the CF Turnstile widget -->
+<script
+	is:inline
+	src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+	async
+	defer
+></script>
+<script>
+	let turnstileWidgetId: string | null = null;
+	let formSubmitHandler: ((e: Event) => void) | null = null;
+
+	/**
+	 * Formats a phone number to (XXX) XXX-XXXX display format
+	 * and validates it's a valid North American number
+	 */
+	function formatPhoneDisplay(value: string): string {
+		// Strip all non-digit characters
+		const digits = value.replace(/\D/g, "");
+		
+		// Remove leading 1 if present (country code)
+		const normalized = digits.startsWith("1") && digits.length > 10 
+			? digits.slice(1) 
+			: digits;
+		
+		// Format as (XXX) XXX-XXXX
+		if (normalized.length <= 3) {
+			return normalized;
+		} else if (normalized.length <= 6) {
+			return `(${normalized.slice(0, 3)}) ${normalized.slice(3)}`;
+		} else {
+			return `(${normalized.slice(0, 3)}) ${normalized.slice(3, 6)}-${normalized.slice(6, 10)}`;
+		}
+	}
+
+	/**
+	 * Validates phone number is valid for North America (10 or 11 digits)
+	 */
+	function isValidPhoneNumber(value: string): boolean {
+		if (!value) return true; // Phone is optional
+		const digits = value.replace(/\D/g, "");
+		return digits.length === 10 || (digits.length === 11 && digits.startsWith("1"));
+	}
+
+	// Function to initialize Turnstile widget
+	function initializeTurnstile() {
+		const widget = document.getElementById("turnstile-widget");
+		
+		if (!widget || typeof turnstile === "undefined") {
+			return;
+		}
+
+		// Remove existing widget if it exists
+		if (turnstileWidgetId) {
+			try {
+				turnstile.remove(turnstileWidgetId);
+				turnstileWidgetId = null;
+			} catch (e) {
+				console.warn("Failed to remove existing turnstile widget:", e);
+			}
+		}
+
+		// Clear the widget container
+		widget.innerHTML = "";
+
+		// Render new widget
+		try {
+			const sitekey = widget.getAttribute("data-sitekey");
+			const theme = widget.getAttribute("data-theme") as "light" | "dark" | "auto" | null;
+			const size = widget.getAttribute("data-size") as "normal" | "compact" | "flexible" | null;
+			
+			const widgetId = turnstile.render("#turnstile-widget", {
+				sitekey: sitekey || "",
+				theme: theme || "dark",
+				size: size || "flexible",
+			});
+			
+			turnstileWidgetId = widgetId ?? null;
+		} catch (e) {
+			console.error("Failed to render turnstile widget:", e);
+		}
+	}
+
+	// Setup form submission handler
+	function setupFormHandler() {
+		const form = document.getElementById("marketing-form") as HTMLFormElement;
+		const submitButton = document.getElementById("submit-button") as HTMLButtonElement;
+		const sendIcon = document.getElementById("send-icon") as HTMLElement;
+		const loaderIcon = document.getElementById("loader-icon") as HTMLElement;
+		const buttonText = document.getElementById("button-text") as HTMLSpanElement;
+		const consentCheckbox = form?.querySelector(
+			'#confirm-policies'
+		) as HTMLInputElement;
+		const phoneInput = form?.querySelector('#phone') as HTMLInputElement;
+
+		if (!form) return;
+
+		// Add live phone formatting
+		if (phoneInput) {
+			phoneInput.addEventListener("input", (e) => {
+				const target = e.target as HTMLInputElement;
+				const cursorPos = target.selectionStart || 0;
+				const oldLength = target.value.length;
+				
+				target.value = formatPhoneDisplay(target.value);
+				
+				// Adjust cursor position after formatting
+				const newLength = target.value.length;
+				const newPos = cursorPos + (newLength - oldLength);
+				target.setSelectionRange(newPos, newPos);
+			});
+		}
+
+		// Remove existing event listener if it exists
+		if (formSubmitHandler) {
+			form.removeEventListener("submit", formSubmitHandler);
+		}
+
+		// Toggle loading state
+		const setLoading = (isLoading: boolean) => {
+			if (!submitButton || !sendIcon || !loaderIcon || !buttonText) return;
+			
+			submitButton.disabled = isLoading;
+			if (isLoading) {
+				sendIcon.classList.add("hidden");
+				loaderIcon.classList.remove("hidden");
+				buttonText.textContent = "Submitting...";
+			} else {
+				sendIcon.classList.remove("hidden");
+				loaderIcon.classList.add("hidden");
+				buttonText.textContent = "Sign Up";
+			}
+		};
+
+		// Update submit button state based on checkbox
+		const updateSubmitButtonState = () => {
+			if (submitButton && consentCheckbox) {
+				submitButton.disabled = !consentCheckbox.checked;
+			}
+		};
+
+		// Add change listener to checkbox
+		if (consentCheckbox) {
+			consentCheckbox.addEventListener("change", updateSubmitButtonState);
+			// Set initial state
+			updateSubmitButtonState();
+		}
+
+		// Create the handler function
+		formSubmitHandler = (e: Event) => {
+			// Client-side validation before submission
+			const turnstileResponse = form.querySelector(
+				'input[name="cf-turnstile-response"]'
+			) as HTMLInputElement;
+
+			if (!turnstileResponse || !turnstileResponse.value) {
+				e.preventDefault();
+				alert("Please complete the CAPTCHA verification before submitting.");
+				return;
+			}
+
+			// Validate consent checkbox
+			if (!consentCheckbox || !consentCheckbox.checked) {
+				e.preventDefault();
+				alert("Please confirm that you consent to providing your information.");
+				return;
+			}
+
+			// Validate email format
+			const emailInput = form.querySelector(
+				'input[name="email"]'
+			) as HTMLInputElement;
+			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+			
+			if (emailInput && !emailRegex.test(emailInput.value)) {
+				e.preventDefault();
+				alert("Please enter a valid email address.");
+				return;
+			}
+
+			// Validate phone number format (if provided)
+			const phoneInputField = form.querySelector(
+				'input[name="phone"]'
+			) as HTMLInputElement;
+			
+			if (phoneInputField?.value && !isValidPhoneNumber(phoneInputField.value)) {
+				e.preventDefault();
+				alert("Please enter a valid 10-digit phone number.");
+				return;
+			}
+
+			// All validation passed, show loading state
+			setLoading(true);
+		};
+
+		// Add the event listener
+		form.addEventListener("submit", formSubmitHandler);
+	}
+
+	// Initialize Turnstile with polling for script availability
+	function setupTurnstile() {
+		if (typeof turnstile !== "undefined") {
+			initializeTurnstile();
+		} else {
+			// Poll for turnstile to be available
+			let attempts = 0;
+			const maxAttempts = 50; // 5 seconds max
+			const interval = setInterval(() => {
+				attempts++;
+				if (typeof turnstile !== "undefined") {
+					clearInterval(interval);
+					initializeTurnstile();
+				} else if (attempts >= maxAttempts) {
+					clearInterval(interval);
+					console.error("Turnstile failed to load");
+				}
+			}, 100);
+		}
+	}
+
+	// Initialize on page load
+	setupTurnstile();
+	setupFormHandler();
+</script>

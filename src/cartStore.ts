@@ -32,7 +32,7 @@ export async function refreshCartState() {
 	const cartId = Cookies.get("cartId");
 	if (cartId) {
 		const currentCart = await getCart(cartId);
-		cart.set(currentCart as any);
+		cart.set(currentCart ?? null);
 	}
 }
 

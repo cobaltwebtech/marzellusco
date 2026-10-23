@@ -89,10 +89,10 @@ const CartModal: React.FC = () => {
 					) : (
 						<div className="flex h-full flex-col justify-between overflow-hidden p-1">
 							<ul className="flex-grow overflow-auto py-4">
-								{currentCart.lines.map((item: any) => {
+								{currentCart.lines.map((item) => {
 									const merchandiseSearchParams: Record<string, string> = {};
 									item.merchandise.selectedOptions.forEach(
-										({ name, value }: any) => {
+										({ name, value }) => {
 											if (value !== DEFAULT_OPTION) {
 												merchandiseSearchParams[name.toLowerCase()] = value;
 											}
@@ -113,6 +113,10 @@ const CartModal: React.FC = () => {
 										new URLSearchParams(merchandiseSearchParams),
 									);
 
+									const itemImage =
+										item.merchandise.image ||
+										item.merchandise.product.featuredImage;
+
 									return (
 										<li
 											key={item.id}
@@ -130,12 +134,11 @@ const CartModal: React.FC = () => {
 														<img
 															className="h-full w-full object-cover"
 															src={
-																item.merchandise.product.featuredImage?.url ||
-																"/images/product_image404.jpg"
+																itemImage?.url || "/images/product_image404.jpg"
 															}
 															alt={
-																item.merchandise.product.featuredImage
-																	?.altText || item.merchandise.product.title
+																itemImage?.altText ||
+																item.merchandise.product.title
 															}
 															width={64}
 															height={64}

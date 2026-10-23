@@ -47,12 +47,27 @@ export type CustomerError = {
 export type registerOperation = {
 	data: {
 		customerCreate: {
-			customer: user;
-			customerUserErrors: CustomerError;
+			customer: user["customer"] | null;
+			customerUserErrors: CustomerError[];
 		};
 	};
 	variables: {
 		input: CustomerInput;
+	};
+};
+
+export type customerAccessTokenOperation = {
+	data: {
+		customerAccessTokenCreate: {
+			customerAccessToken: { accessToken: string } | null;
+			customerUserErrors: CustomerError[];
+		};
+	};
+	variables: {
+		input: {
+			email?: string;
+			password?: string;
+		};
 	};
 };
 
@@ -197,7 +212,24 @@ export type ShopifyProduct = {
 	tags: string[];
 	updatedAt: string;
 	vendor: string;
-	collections: any;
+	collections: {
+		nodes: {
+			title: string;
+			products: {
+				edges: Edge<{ title: string; vendor: string }>[];
+			};
+		}[];
+	};
+};
+
+/** Subset of the Storefront API `ProductFilter` input used by the app. */
+export type ProductFilter = {
+	available?: boolean;
+	productType?: string;
+	productVendor?: string;
+	tag?: string;
+	price?: { min?: number; max?: number };
+	variantOption?: { name: string; value: string };
 };
 
 export type ShopifyCartOperation = {
@@ -278,6 +310,7 @@ export type ShopifyCollectionProductsOperation = {
 		handle: string;
 		reverse?: boolean;
 		sortKey?: string;
+		filterCategoryProduct?: ProductFilter[];
 	};
 };
 
@@ -340,5 +373,15 @@ export type ShopifyProductsOperation = {
 		reverse?: boolean;
 		sortKey?: string;
 		cursor?: string;
+	};
+};
+
+export type ShopifyHighestProductPriceOperation = {
+	data: {
+		products: {
+			edges: Edge<{
+				variants: Connection<{ price: Money }>;
+			}>[];
+		};
 	};
 };

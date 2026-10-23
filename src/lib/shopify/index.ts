@@ -35,12 +35,15 @@ import type {
 	Cart,
 	Collection,
 	Connection,
+	CustomerError,
 	CustomerInput,
+	customerAccessTokenOperation,
 	Image,
 	Menu,
 	Page,
 	PageInfo,
 	Product,
+	ProductFilter,
 	registerOperation,
 	ShopifyAddToCartOperation,
 	ShopifyCart,
@@ -50,6 +53,7 @@ import type {
 	ShopifyCollectionProductsOperation,
 	ShopifyCollectionsOperation,
 	ShopifyCreateCartOperation,
+	ShopifyHighestProductPriceOperation,
 	ShopifyMenuOperation,
 	ShopifyPageOperation,
 	ShopifyPagesOperation,
@@ -108,7 +112,7 @@ export async function shopifyFetch<T>({
 			throw new Error(`Request failed with status ${result.status}`);
 		}
 
-		const body = await result.json();
+		const body = (await result.json()) as T & { errors?: unknown[] };
 
 		if (body.errors) {
 			throw body.errors[0];
@@ -135,7 +139,7 @@ export async function shopifyFetch<T>({
 	}
 }
 
-const removeEdgesAndNodes = (array: Connection<any>) => {
+const removeEdgesAndNodes = <T>(array: Connection<T>): T[] => {
 	return array.edges.map((edge) => edge?.node);
 };
 
@@ -186,10 +190,12 @@ const reshapeImages = (images: Connection<Image>, productTitle: string) => {
 	const flattened = removeEdgesAndNodes(images);
 
 	return flattened.map((image) => {
-		const filename = image.url.match(/.*\/(.*)\..*/)[1];
+		const filename = image.url.match(/.*\/(.*)\..*/)?.[1];
 		return {
 			...image,
-			altText: image.altText || `${productTitle} - ${filename}`,
+			altText:
+				image.altText ||
+				(filename ? `${productTitle} - ${filename}` : productTitle),
 		};
 	});
 };
@@ -324,7 +330,7 @@ export async function getCollectionProducts({
 	collection: string;
 	reverse?: boolean;
 	sortKey?: string;
-	filterCategoryProduct?: any[]; // Update the type based on your GraphQL schema
+	filterCategoryProduct?: ProductFilter[];
 }): Promise<{ pageInfo: PageInfo | null; products: Product[] }> {
 	const res = await shopifyFetch<ShopifyCollectionProductsOperation>({
 		query: getCollectionProductsQuery,
@@ -334,11 +340,6 @@ export async function getCollectionProducts({
 			reverse,
 			sortKey: sortKey === "CREATED_AT" ? "CREATED" : sortKey,
 			filterCategoryProduct,
-		} as {
-			handle: string;
-			reverse?: boolean;
-			sortKey?: string;
-			filterCategoryProduct?: any[];
 		},
 	});
 
@@ -357,7 +358,10 @@ export async function getCollectionProducts({
 	};
 }
 
-export async function createCustomer(input: CustomerInput): Promise<any> {
+export async function createCustomer(input: CustomerInput): Promise<{
+	customer: registerOperation["data"]["customerCreate"]["customer"];
+	customerCreateErrors: CustomerError[];
+}> {
 	const res = await shopifyFetch<registerOperation>({
 		query: createCustomerMutation,
 		variables: {
@@ -377,8 +381,11 @@ export async function createCustomer(input: CustomerInput): Promise<any> {
 export async function getCustomerAccessToken({
 	email,
 	password,
-}: Partial<CustomerInput>): Promise<any> {
-	const res = await shopifyFetch<any>({
+}: Partial<CustomerInput>): Promise<{
+	token: string | undefined;
+	customerLoginErrors: CustomerError[] | undefined;
+}> {
+	const res = await shopifyFetch<customerAccessTokenOperation>({
 		query: getCustomerAccessTokenMutation,
 		variables: { input: { email, password } },
 	});
@@ -584,7 +591,7 @@ export async function getHighestProductPrice(): Promise<{
 	currencyCode: string;
 } | null> {
 	try {
-		const res = await shopifyFetch<any>({
+		const res = await shopifyFetch<ShopifyHighestProductPriceOperation>({
 			query: getHighestProductPriceQuery,
 		});
 

@@ -3,7 +3,7 @@ import { actions, isInputError } from "astro:actions";
 import OctagonAlert from "@tabler/icons/outline/alert-octagon.svg";
 import Loader2 from "@tabler/icons/outline/loader-2.svg";
 import Send from "@tabler/icons/outline/send.svg";
-import { CldImage } from "astro-cloudinary";
+import { Image } from "astro:assets";
 import { Button } from "@/components/starwind/button";
 import {
   Card,
@@ -23,6 +23,7 @@ import {
 	DialogTrigger,
 } from "@/components/starwind/dialog";
 import { Input } from "@/components/starwind/input";
+import banner from "@/images/marzellus-banner.avif";
 import Base from "@/layouts/Base.astro";
 
 const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
@@ -59,21 +60,18 @@ if (result?.error) {
 		errorMessage = result.error.message;
 	}
 }
-const banner =
-  "marzellus/marzellus-banner.avif";
 ---
 
 <Base>
 	<section class="w-full max-w-5xl mx-auto relative">
 		<div class="w-full aspect-2/3 min-h-screen">
-			<CldImage
+			<Image
 				class="w-full h-full object-cover"
 				src={banner}
 				alt="Marzellus banner image"
 				draggable="false"
 				format="avif"
-				width={1024}
-				height={1536}
+				priority
 			/>
 		</div>
 		<div class="absolute inset-0 flex flex-col justify-center items-center">

@@ -1,5 +1,6 @@
 import { ActionError, defineAction } from "astro:actions";
-import { z } from "astro:schema";
+import { z } from "astro/zod";
+import { env } from "cloudflare:workers";
 import { drizzle } from "drizzle-orm/d1";
 import {
 	ApiKeySession,
@@ -46,7 +47,7 @@ function formatPhoneToE164(phone: string | undefined): string | null {
 const marketingFormSchema = z.object({
 	firstname: z.string().min(1, "First name is required"),
 	lastname: z.string().min(1, "Last name is required"),
-	email: z.string().email("Invalid email address"),
+	email: z.email("Invalid email address"),
 	phone: z.string().optional(),
 	"confirm-policies": z
 		.string()
@@ -61,7 +62,7 @@ const marketingFormSchema = z.object({
 
 // Verify Cloudflare Turnstile token
 async function verifyTurnstileToken(token: string): Promise<boolean> {
-	const secretKey = import.meta.env.TURNSTILE_SECRET_KEY;
+	const secretKey = env.TURNSTILE_SECRET_KEY;
 
 	const formData = new FormData();
 	formData.append("secret", secretKey);
@@ -89,7 +90,7 @@ export const server = {
 	storeMarketingForm: defineAction({
 		accept: "form",
 		input: marketingFormSchema,
-		handler: async (input, context) => {
+		handler: async (input) => {
 			// Verify Turnstile token server-side
 			const isValidToken = await verifyTurnstileToken(
 				input["cf-turnstile-response"],
@@ -103,7 +104,7 @@ export const server = {
 			}
 
 			// Initialize database connection
-			const db = drizzle(context.locals.runtime.env.DB_MARKETING);
+			const db = drizzle(env.DB_MARKETING);
 
 			// Format phone to E.164 format for Klaviyo and database storage
 			const formattedPhone = formatPhoneToE164(input.phone);
@@ -112,7 +113,7 @@ export const server = {
 			let klaviyoProfileId: string | null = null;
 
 			try {
-				const session = new ApiKeySession(import.meta.env.KLAVIYO_API_KEY);
+				const session = new ApiKeySession(env.KLAVIYO_API_KEY);
 				const profilesApi = new ProfilesApi(session);
 
 				// Create or update profile with all fields (firstName, lastName, etc.)

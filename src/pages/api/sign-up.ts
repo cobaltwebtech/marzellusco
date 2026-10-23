@@ -38,14 +38,17 @@ export const POST: APIRoute = async ({ request }) => {
 		response.headers.set("Set-Cookie", `token=${token}; Path=/; SameSite=Lax`);
 
 		return response;
-	} catch (error: any) {
+	} catch (error) {
 		console.error("Error in API:", error);
 		return new Response(
 			JSON.stringify({
 				errors: [
 					{
 						code: "INTERNAL_ERROR",
-						message: error.message || "An unknown error occurred",
+						message:
+							error instanceof Error
+								? error.message
+								: "An unknown error occurred",
 					},
 				],
 			}),

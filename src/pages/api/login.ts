@@ -1,9 +1,11 @@
 import { getCustomerAccessToken, getUserDetails } from "@/lib/shopify";
 
+type LoginBody = { email?: string; password?: string };
+
 // Exporting the handler function for the API route
 export const POST = async ({ request }: { request: Request }) => {
 	try {
-		const { email, password } = await request.json();
+		const { email, password } = (await request.json()) as LoginBody;
 
 		if (!email || !password) {
 			return new Response(
@@ -20,11 +22,20 @@ export const POST = async ({ request }: { request: Request }) => {
 			password,
 		});
 
-		if (customerLoginErrors?.length > 0) {
+		if (customerLoginErrors && customerLoginErrors.length > 0) {
 			return new Response(JSON.stringify({ errors: customerLoginErrors }), {
 				status: 400,
 				headers: { "Content-Type": "application/json" },
 			});
+		}
+
+		if (!token) {
+			return new Response(
+				JSON.stringify({
+					errors: [{ message: "Unable to retrieve an access token." }],
+				}),
+				{ status: 401, headers: { "Content-Type": "application/json" } },
+			);
 		}
 
 		// Fetch customer details using the token
@@ -39,7 +50,7 @@ export const POST = async ({ request }: { request: Request }) => {
 		response.headers.set("Set-Cookie", `token=${token}; Path=/; SameSite=Lax`);
 
 		return response;
-	} catch (error: any) {
+	} catch (error) {
 		console.error("Error during login:", error);
 
 		return new Response(
@@ -47,7 +58,10 @@ export const POST = async ({ request }: { request: Request }) => {
 				errors: [
 					{
 						code: "INTERNAL_ERROR",
-						message: error.message || "An unknown error occurred",
+						message:
+							error instanceof Error
+								? error.message
+								: "An unknown error occurred",
 					},
 				],
 			}),

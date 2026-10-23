@@ -1,8 +1,7 @@
 {
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
-    "baseUrl": ".",
-    "target": "es2023",
+    "target": "es2024",
     "allowJs": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
@@ -11,6 +10,7 @@
     "isolatedModules": true,
     "incremental": true,
     "allowSyntheticDefaultImports": true,
+    "types": ["node", "cloudflare-turnstile"],
     "paths": {
       "@/components/*": ["./src/layouts/components/*"],
       "@/functional-components/*": ["./src/layouts/functional-components/*"],

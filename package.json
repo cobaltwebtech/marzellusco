@@ -27,7 +27,7 @@
     "@astrojs/sitemap": "3.7.4",
     "@nanostores/react": "^2.0.1",
     "@playform/compress": "^0.2.5",
-    "@tabler/icons": "^3.49.0",
+    "@tabler/icons": "^3.50.0",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "7.4.2",
     "astro-auto-import": "^0.6.0",
